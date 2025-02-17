@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ book.title }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h1 class="card-title">{{ book.title }}</h1>
+        <h6 class="card-subtitle mb-2 text-muted">{{ book.author }}</h6>
+        
+        <div class="row mt-4">
+            <div class="col-md-8">
+                <p><strong>ISBN：</strong>{{ book.isbn }}</p>
+                <p><strong>分类：</strong>{{ book.category }}</p>
+                <p><strong>可借数量：</strong>{{ book.available }}/{{ book.quantity }}</p>
+                <p><strong>描述：</strong></p>
+                <p>{{ book.description|linebreaks }}</p>
+            </div>
+            
+            <div class="col-md-4">
+                {% if user.is_authenticated %}
+                    {% if book.available > 0 %}
+                    <a href="{% url 'borrow_book' book.pk %}" class="btn btn-primary">借阅此书</a>
+                    {% else %}
+                    <button class="btn btn-secondary" disabled>暂无可借</button>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary">登录后借阅</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}我的借阅 - {{ block.super }}{% endblock %}
+
+{% block content %}
+<h1>我的借阅记录</h1>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>图书</th>
+                <th>借阅时间</th>
+                <th>归还时间</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for borrowing in borrowings %}
+            <tr>
+                <td>
+                    <a href="{% url 'book_detail' borrowing.book.pk %}">
+                        {{ borrowing.book.title }}
+                    </a>
+                </td>
+                <td>{{ borrowing.borrowed_date|date:"Y-m-d H:i" }}</td>
+                <td>
+                    {% if borrowing.return_date %}
+                        {{ borrowing.return_date|date:"Y-m-d H:i" }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if borrowing.returned %}
+                        <span class="badge bg-success">已归还</span>
+                    {% else %}
+                        <span class="badge bg-warning">借阅中</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if not borrowing.returned %}
+                        <a href="{% url 'return_book' borrowing.book.pk %}" 
+                           class="btn btn-sm btn-primary">
+                            归还
+                        </a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">暂无借阅记录</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

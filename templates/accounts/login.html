@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}登录 - 图书管理系统{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4">我的登录</h3>
+                
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <strong>登录失败！</strong> 请检查用户名和密码是否正确。
+                    </div>
+                    {% endif %}
+
+                    {% if next %}
+                        {% if user.is_authenticated %}
+                        <div class="alert alert-warning">
+                            您的账号没有访问该页面的权限，请使用其他账号登录。
+                        </div>
+                        {% else %}
+                        <div class="alert alert-info">
+                            请登录后继续访问。
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="username" class="form-label">用户名</label>
+                        <input type="text" name="username" class="form-control" id="username" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="password" class="form-label">密码</label>
+                        <input type="password" name="password" class="form-control" id="password" required>
+                    </div>
+                    
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">
+                        <label class="form-check-label" for="remember-me">记住我</label>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">登录</button>
+                    </div>
+                    
+                    <input type="hidden" name="next" value="{{ next }}">
+                </form>
+                
+                <hr class="my-4">
+                
+                <div class="text-center">
+                    <p class="mb-2">还没有账号？ <a href="{% url 'register' %}">立即注册</a></p>
+                    <p class="mb-0"><a href="{% url 'password_reset' %}">忘记密码？</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 可选：添加一些自定义样式 -->
+<style>
+    .card {
+        border-radius: 1rem;
+        border: none;
+    }
+    .card-body {
+        padding: 2rem;
+    }
+    .btn-primary {
+        padding: 0.8rem;
+        font-weight: 500;
+    }
+    .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,.15);
+    }
+</style>
+{% endblock %}
+
