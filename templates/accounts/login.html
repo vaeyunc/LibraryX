@@ -1,85 +1,110 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
+{% load static %}
+{% block extra_css %}
+<link href="{% static 'css/login.css' %}" rel="'stylesheet">
+{% endblock %}
 
-{% block title %}登录 - 图书管理系统{% endblock %}
-
+{% block title %}登录 - 我的图书管{% endblock %}
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h3 class="card-title text-center mb-4">我的登录</h3>
-                
-                <form method="post" novalidate>
-                    {% csrf_token %}
-                    
-                    {% if form.errors %}
-                    <div class="alert alert-danger">
-                        <strong>登录失败！</strong> 请检查用户名和密码是否正确。
-                    </div>
-                    {% endif %}
+<div class="container mt-5">
+    <div class="row g-0 border rounded overflow-hidden shadow-sm">
+        <!-- 左侧图片 -->
+        <div class="col-md-7 p-0">
+            <img src="{% static 'images/vangoah_starryNight.png' %}" 
+                 class="img-fluid h-100 w-100 object-fit-cover" 
+                 alt="Library Image"
+                 style="min-height: 600px;">
+        </div>
+        
+        <!-- 右侧登录表单 -->
+        <div class="col-md-5 p-4 d-flex flex-column justify-content-center">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold">欢迎登录</h2>
+                <p class="text-muted">图书管理系统</p>
+            </div>
 
-                    {% if next %}
-                        {% if user.is_authenticated %}
-                        <div class="alert alert-warning">
-                            您的账号没有访问该页面的权限，请使用其他账号登录。
-                        </div>
-                        {% else %}
-                        <div class="alert alert-info">
-                            请登录后继续访问。
-                        </div>
-                        {% endif %}
-                    {% endif %}
-                    
-                    <div class="mb-3">
-                        <label for="username" class="form-label">用户名</label>
-                        <input type="text" name="username" class="form-control" id="username" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="password" class="form-label">密码</label>
-                        <input type="password" name="password" class="form-control" id="password" required>
-                    </div>
-                    
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">
-                        <label class="form-check-label" for="remember-me">记住我</label>
-                    </div>
-                    
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">登录</button>
-                    </div>
-                    
-                    <input type="hidden" name="next" value="{{ next }}">
-                </form>
+            <form method="post" novalidate>
+                {% csrf_token %}
                 
-                <hr class="my-4">
-                
-                <div class="text-center">
-                    <p class="mb-2">还没有账号？ <a href="{% url 'register' %}">立即注册</a></p>
-                    <p class="mb-0"><a href="{% url 'password_reset' %}">忘记密码？</a></p>
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <strong>登录失败！</strong> 请检查用户名和密码是否正确。
                 </div>
+                {% endif %}
+
+                {% if next %}
+                    {% if user.is_authenticated %}
+                    <div class="alert alert-warning">
+                        您的账号没有访问该页面的权限，请使用其他账号登录。
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        请登录后继续访问。
+                    </div>
+                    {% endif %}
+                {% endif %}
+                
+                <div class="form-floating mb-3">
+                    <input type="text" 
+                           name="username" 
+                           class="form-control" 
+                           id="username" 
+                           placeholder="用户名"
+                           required>
+                    <label for="username">用户名</label>
+                </div>
+                
+                <div class="form-floating mb-3">
+                    <input type="password" 
+                           name="password" 
+                           class="form-control" 
+                           id="password" 
+                           placeholder="密码"
+                           required>
+                    <label for="password">密码</label>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="remember-me" name="remember-me">
+                    <label class="form-check-label" for="remember-me">记住我</label>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">登录</button>
+                </div>
+                
+                <input type="hidden" name="next" value="{{ next }}">
+            </form>
+            
+            <div class="text-center mt-4">
+                <p class="mb-2">还没有账号？ <a href="{% url 'register' %}" class="text-decoration-none">立即注册</a></p>
+                <p class="mb-0"><a href="{% url 'password_reset' %}" class="text-decoration-none">忘记密码？</a></p>
             </div>
         </div>
     </div>
 </div>
 
-<!-- 可选：添加一些自定义样式 -->
 <style>
-    .card {
-        border-radius: 1rem;
-        border: none;
-    }
-    .card-body {
-        padding: 2rem;
-    }
-    .btn-primary {
-        padding: 0.8rem;
-        font-weight: 500;
-    }
-    .form-control:focus {
-        box-shadow: 0 0 0 0.25rem rgba(13,110,253,.15);
-    }
+/* 自定义样式 */
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: #0d6efd;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+.btn-primary {
+    padding: 0.8rem;
+    font-weight: 500;
+}
+
+.object-fit-cover {
+    object-fit: cover;
+}
 </style>
 {% endblock %}
 

@@ -3,10 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.contrib import messages
 from django.utils import timezone
-from .models import Book, BookBorrowing
+from .models import Book, BookBorrowing, Category
 from .forms import BookSearchForm, RegisterForm
+from django.db.models import Count
 
-
+@login_required
 def book_list(request):
     books = Book.objects.all()
     form = BookSearchForm(request.GET) 
@@ -27,6 +28,7 @@ def book_list(request):
         'form': form
     })
 
+@login_required
 def book_detail(request, pk):
     book = get_object_or_404(Book, pk=pk)
     return render(request, 'books/book_detail.html', {'book': book})
@@ -81,3 +83,20 @@ def register(request):
     else:
         form = RegisterForm()
     return render(request, 'accounts/register.html', {'form': form})
+
+def index(request):
+    #get some datas
+    total_books = Book.objects.count() #int
+    total_categories = Category.objects.count() #int
+    recent_books = Book.objects.order_by('-id')[:6] # recent added six books
+    popular_categories = Category.objects.annotate(
+        book_count=Count('book')
+    ).order_by('-book_count')[:5] # most popular five categories
+
+    context = {
+        'total_books': total_books,
+        'total_categories': total_categories,
+        'recent_books': recent_books,
+        'popular_categories': popular_categories,
+    }
+    return render(request, 'index.html', context)

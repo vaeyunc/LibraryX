@@ -17,7 +17,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
-from django.views.generic import RedirectView
 from books import views
 
 urlpatterns = [
@@ -27,7 +26,5 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(template_name='accounts/logout.html', next_page='login'), name='logout'),
     path('register/', views.register, name='register'),
     path('passwordReset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
-    # path('accounts/', include('django.contrib.auth.urls')),
-    path('', RedirectView.as_view(url='/books/', permanent=True)),
-    
+    path('', views.index, name='index'), 
 ]

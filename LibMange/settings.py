@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'books',
-    'templates',
-    'static',
+    # 'templates',
+    # 'static',
     'crispy_forms',
     'crispy_bootstrap5',
 ]
@@ -75,11 +75,10 @@ TEMPLATES = [
         },
     },
 ]
-# LOGIN_REDIRECT_URL = 'book_list'
-# LOGOUT_REDIRECT_URL = 'book.list'
-LOGIN_REDIRECT_URL = '/books/'# after login redirect to book_list
+
+LOGIN_REDIRECT_URL = '/'# after login redirect to index 
 LOGIN_URL = '/login/' # redirect to login page when needs to login
-LOGIN_REDIRECT_URL = '/login/' #redirect to login page after quit
+LOGOUT_REDIRECT_URL = '/login/' #redirect to login page after quit
 
 WSGI_APPLICATION = 'LibMange.wsgi.application'
 
@@ -135,6 +134,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

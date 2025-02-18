@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link href="{% static 'css/index.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block title %}首页 - 图书管理系统{% endblock %}
+
+{% block content %}
+<!-- 头部横幅 -->
+<div class="hero-section py-5 mb-5 bg-primary text-white">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <h1 class="display-4 fw-bold mb-3">欢迎来到图书馆</h1>
+                <p class="lead mb-4">探索知识的海洋，开启阅读的旅程</p>
+                {% if not user.is_authenticated %}
+                <div class="d-grid gap-2 d-md-flex">
+                    <a href="{% url 'login' %}" class="btn btn-light btn-lg px-4">立即登录</a>
+                    <a href="{% url 'register' %}" class="btn btn-outline-light btn-lg px-4">注册账号</a>
+                </div>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <img src="{% static 'images/space.jpg' %}" alt="Library" class="img-fluid rounded shadow">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 统计数据 -->
+<div class="container mb-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-book display-4 text-primary mb-3"></i>
+                    <h3 class="card-title">{{ total_books }}</h3>
+                    <p class="card-text text-muted">馆藏图书总量</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-grid display-4 text-primary mb-3"></i>
+                    <h3 class="card-title">{{ total_categories }}</h3>
+                    <p class="card-text text-muted">图书分类</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-people display-4 text-primary mb-3"></i>
+                    <h3 class="card-title">在线服务</h3>
+                    <p class="card-text text-muted">随时随地借阅</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 最新图书 -->
+<div class="container mb-5">
+    <h2 class="mb-4">最新上架</h2>
+    <div class="row g-4">
+        {% for book in recent_books %}
+        <div class="col-md-4 col-lg-2">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-truncate">{{ book.title }}</h5>
+                    <p class="card-text text-muted small mb-0">{{ book.author }}</p>
+                    <p class="card-text"><small class="text-muted">{{ book.category.name }}</small></p>
+                    <a href="{% url 'book_detail' book.pk %}" class="btn btn-outline-primary btn-sm">查看详情</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- 热门分类 -->
+<div class="container mb-5">
+    <h2 class="mb-4">热门分类</h2>
+    <div class="row g-4">
+        {% for category in popular_categories %}
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ category.name }}</h5>
+                    <p class="card-text text-muted">{{ category.description|truncatewords:20 }}</p>
+                    <p class="card-text"><small class="text-muted">包含 {{ category.book_count }} 本图书</small></p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
