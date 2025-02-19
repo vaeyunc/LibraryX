@@ -2,10 +2,10 @@
 {% load crispy_forms_tags %}
 {% load static %}
 {% block extra_css %}
-<link href="{% static 'css/login.css' %}" rel="'stylesheet">
+<link href="{% static 'css/login.css' %}" rel="stylesheet">
 {% endblock %}
 
-{% block title %}登录 - 我的图书管{% endblock %}
+{% block title %}登录 - 我的图书馆{% endblock %}
 {% block content %}
 <div class="container mt-5">
     <div class="row g-0 border rounded overflow-hidden shadow-sm">
@@ -21,7 +21,7 @@
         <div class="col-md-5 p-4 d-flex flex-column justify-content-center">
             <div class="text-center mb-4">
                 <h2 class="fw-bold">欢迎登录</h2>
-                <p class="text-muted">图书管理系统</p>
+                <p class="text-muted">BlackBook图书馆</p>
             </div>
 
             <form method="post" novalidate>

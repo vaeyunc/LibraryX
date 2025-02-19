@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.utils import timezone
 from .models import Book, BookBorrowing, Category
 from .forms import BookSearchForm, RegisterForm
-from django.db.models import Count
+from django.db.models import Count, F, Q
 
 @login_required
 def book_list(request):
@@ -100,3 +100,36 @@ def index(request):
         'popular_categories': popular_categories,
     }
     return render(request, 'index.html', context)
+
+def library_status(request):
+    #获取图书统计信息
+    total_books = Book.objects.count()
+    available_books = Book.objects.filter(available__gt=0).count()
+    borrow_books = Book.objects.filter(available__lt=F('quantity')).count()
+
+    #获取各分类图书数量
+    categories = Category.objects.annotate(
+        book_count=Count('book'),
+        available_count=Count('book', filter=Q(book__available__gt=0))
+    ).order_by('-book_count')
+
+    #获取借阅量最多的图书
+    popular_books = Book.objects.annotate(
+        borrow_count=Count('bookborrowing')
+    ).order_by('-borrow_count')[:5]
+
+    #获取借阅统计信息
+    borrow_stats = BookBorrowing.objects.values('book_id').annotate(
+        borrow_count=Count('id')
+    ).order_by('-borrow_count')
+
+    context = {
+        'total_books': total_books,
+        'available_books': available_books,
+        'borrow_books': borrow_books,
+        'categories': categories,
+        'popular_books': popular_books,
+        'borrow_stats': borrow_stats,
+    }
+    return render(request, 'books/library_stats.html', context)
+    

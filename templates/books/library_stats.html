@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load book_filters %}
+{% block title %}馆藏统计 - 图书管理系统{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- 总体统计卡片 -->
+    <div class="row mb-5">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 bg-primary text-white">
+                <div class="card-body text-center">
+                    <h3 class="display-4 fw-bold">{{ total_books }}</h3>
+                    <p class="h5">馆藏总量</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 bg-success text-white">
+                <div class="card-body text-center">
+                    <h3 class="display-4 fw-bold">{{ available_books }}</h3>
+                    <p class="h5">可借数量</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm h-100 bg-info text-white">
+                <div class="card-body text-center">
+                    <h3 class="display-4 fw-bold">{{ borrowed_books }}</h3>
+                    <p class="h5">借出数量</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 分类统计 -->
+    <h2 class="mb-4">分类统计</h2>
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>分类名称</th>
+                                    <th>图书总量</th>
+                                    <th>可借数量</th>
+                                    <th>借出数量</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in categories %}
+                                <tr>
+                                    <td>{{ category.name }}</td>
+                                    <td>{{ category.book_count }}</td>
+                                    <td>{{ category.available_count }}</td>
+                                    <td>{{ category.book_count|sub:category.available_count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 热门图书 -->
+    <h2 class="mb-4">借阅榜</h2>
+    <div class="row">
+        {% for book in popular_books %}
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ book.title }}</h5>
+                    <p class="card-text">
+                        <small class="text-muted">作者：{{ book.author }}</small><br>
+                        <small class="text-muted">分类：{{ book.category.name }}</small><br>
+                        <small class="text-muted">借阅次数：{{ book.borrow_count }}</small>
+                    </p>
+                    <a href="{% url 'book_detail' book.pk %}" class="btn btn-sm btn-outline-primary">查看详情</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
