@@ -1,0 +1,112 @@
+{
+    "site_title": "图书管理系统",
+    "site_footer": "图书管理系统 V1.0",
+    "menu_style": "vertical",
+    "dynamic": false,
+    "menus": [
+        {
+            "name": "图书管理",
+            "icon": "fas fa-book",
+            "models": [
+                {
+                    "name": "图书分类",
+                    "icon": "fas fa-list",
+                    "url": "/admin/books/category/"
+                },
+                {
+                    "name": "图书信息",
+                    "icon": "fas fa-book-open",
+                    "url": "/admin/books/book/"
+                }
+            ]
+        },
+        {
+            "name": "借阅管理",
+            "icon": "fas fa-exchange-alt",
+            "models": [
+                {
+                    "name": "借阅记录",
+                    "icon": "fas fa-sign-out-alt",
+                    "url": "/admin/books/bookborrowing/"
+                },
+                {
+                    "name": "归还记录",
+                    "icon": "fas fa-sign-in-alt",
+                    "url": "/admin/books/bookreturn/"
+                },
+                {
+                    "name": "预约记录",
+                    "icon": "fas fa-calendar-check",
+                    "url": "/admin/books/bookreservation/"
+                }
+            ]
+        },
+        {
+            "name": "用户互动",
+            "icon": "fas fa-users",
+            "models": [
+                {
+                    "name": "图书评论",
+                    "icon": "fas fa-comments",
+                    "url": "/admin/books/bookcomment/"
+                },
+                {
+                    "name": "图书推荐",
+                    "icon": "fas fa-thumbs-up",
+                    "url": "/admin/books/bookrecommendation/"
+                }
+            ]
+        },
+        {
+            "name": "消息管理",
+            "icon": "fas fa-bell",
+            "models": [
+                {
+                    "name": "系统通知",
+                    "icon": "fas fa-bullhorn",
+                    "url": "/admin/notification/"
+                },
+                {
+                    "name": "消息提醒",
+                    "icon": "fas fa-envelope",
+                    "url": "/admin/message/"
+                }
+            ]
+        },
+        {
+            "name": "用户管理",
+            "icon": "fas fa-user-cog",
+            "models": [
+                {
+                    "name": "用户列表",
+                    "icon": "fas fa-users",
+                    "url": "/admin/auth/user/"
+                },
+                {
+                    "name": "用户组",
+                    "icon": "fas fa-user-friends",
+                    "url": "/admin/auth/group/"
+                },
+                {
+                    "name": "权限管理",
+                    "icon": "fas fa-key",
+                    "url": "/admin/auth/permission/"
+                }
+            ]
+        }
+    ],
+    "simpleui_icon": {
+        "图书分类": "fas fa-list",
+        "图书信息": "fas fa-book-open",
+        "借阅记录": "fas fa-sign-out-alt",
+        "归还记录": "fas fa-sign-in-alt",
+        "预约记录": "fas fa-calendar-check",
+        "图书评论": "fas fa-comments",
+        "图书推荐": "fas fa-thumbs-up",
+        "系统通知": "fas fa-bullhorn",
+        "消息提醒": "fas fa-envelope",
+        "用户列表": "fas fa-users",
+        "用户组": "fas fa-user-friends",
+        "权限管理": "fas fa-key"
+    }
+}

@@ -23,8 +23,12 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('books/', include('books.urls')),
     path('login/', auth_views.LoginView.as_view(template_name='accounts/login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(template_name='accounts/logout.html', next_page='login'), name='logout'),
+    path('logout/', auth_views.LogoutView.as_view(template_name='accounts/logout.html', next_page='login', http_method_names=['get', 'post']), name='logout'),
     path('register/', views.register, name='register'),
+    path('profile/', views.profile_view, name='profile'),
+    path('profile/edit/', views.edit_profile, name='edit_profile'),
+    path('library-status/', views.library_status, name='library_status'),
+    path('statistics/', views.statistics_view, name='statistics'),
     path('passwordReset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
     path('', views.index, name='index'), 
 ]

@@ -11,9 +11,31 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+# import os
+import json
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+#获取项目根目录
+# BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# 读取config.json文件
+def load_config():
+    config_path = BASE_DIR / 'config.json'
+    try:
+        with open(config_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"读取配置文件失败: {e}")
+        return {}
+
+#simpleUI 配置
+SIMPLEUI_CONFIG = load_config()
+SIMPLEUI_HOME_INFO = False  # 关闭首页的统计信息
+SIMPLEUI_ANALYSIS = False   # 关闭使用分析
+SIMPLEUI_HOME_TITLE = '图书管理系统'
+SIMPLEUI_LOGO = '/static/images/log.png' 
 
 
 # Quick-start development settings - unsuitable for production
@@ -31,6 +53,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'simpleui',
     'admin_interface',
     'colorfield',
     'django.contrib.admin',
@@ -121,7 +144,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # LANGUAGE_CODE = 'en-us'
 LANGUAGE_CODE = 'zh-hans'
 
-TIME_ZONE = 'Asia/shanghai'
+TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
 

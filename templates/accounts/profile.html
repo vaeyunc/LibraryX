@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}个人中心 - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <!-- 个人信息卡片 -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" class="rounded-circle mb-3" width="150" height="150" alt="头像">
+                    {% else %}
+                    <img src="{% static 'images/default-avatar.png' %}" class="rounded-circle mb-3" width="150" height="150" alt="默认头像">
+                    {% endif %}
+                    <h4>{{ user.username }}</h4>
+                    <p class="text-muted">{{ user.get_role_display }}</p>
+                    <p>
+                        <i class="bi bi-envelope"></i> {{ user.email }}<br>
+                        <i class="bi bi-phone"></i> {{ user.phone }}
+                    </p>
+                    <a href="{% url 'edit_profile' %}" class="btn btn-primary">编辑资料</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 借阅统计 -->
+        <div class="col-md-8 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">借阅统计</h5>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <h3>{{ user_stats.total_borrowed }}</h3>
+                            <p class="text-muted">总借阅量</p>
+                        </div>
+                        <div class="col-4">
+                            <h3>{{ user_stats.current_borrowed }}</h3>
+                            <p class="text-muted">当前借阅</p>
+                        </div>
+                        <div class="col-4">
+                            <h3>{{ user_stats.overdue_books }}</h3>
+                            <p class="text-muted">逾期图书</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 当前借阅 -->
+        <div class="col-12 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">当前借阅</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>图书</th>
+                                    <th>借阅日期</th>
+                                    <th>应还日期</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for borrowing in current_borrowings %}
+                                <tr>
+                                    <td>{{ borrowing.book.title }}</td>
+                                    <td>{{ borrowing.borrow_date|date:"Y-m-d" }}</td>
+                                    <td>{{ borrowing.due_date|date:"Y-m-d" }}</td>
+                                    <td>
+                                        {% if borrowing.is_overdue %}
+                                        <span class="badge bg-danger">已逾期</span>
+                                        {% else %}
+                                        <span class="badge bg-success">借阅中</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'return_book' borrowing.pk %}" class="btn btn-sm btn-primary">归还</a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">暂无借阅记录</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

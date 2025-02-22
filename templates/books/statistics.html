@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}统计信息 - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- 总体统计卡片 -->
+    <h2 class="mb-4">图书统计</h2>
+    <div class="row mb-5">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-book display-4 text-primary"></i>
+                    <h3>{{ book_stats.total_books }}</h3>
+                    <p class="text-muted">馆藏总量</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-grid display-4 text-success"></i>
+                    <h3>{{ book_stats.total_categories }}</h3>
+                    <p class="text-muted">图书分类</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-check-circle display-4 text-info"></i>
+                    <h3>{{ book_stats.available_books }}</h3>
+                    <p class="text-muted">可借图书</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="bi bi-arrow-repeat display-4 text-warning"></i>
+                    <h3>{{ book_stats.borrowed_books }}</h3>
+                    <p class="text-muted">借出图书</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 借阅统计 -->
+    <h2 class="mb-4">借阅统计</h2>
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">热门图书排行</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>书名</th>
+                                    <th>借阅次数</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for book in popular_books %}
+                                <tr>
+                                    <td>{{ book.title }}</td>
+                                    <td>{{ book.borrow_count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">分类借阅排行</h5>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>分类</th>
+                                    <th>借阅次数</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in category_stats %}
+                                <tr>
+                                    <td>{{ category.name }}</td>
+                                    <td>{{ category.borrow_count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
