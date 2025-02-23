@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}我的通知 - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">我的通知</h1>
+            
+            {% if unread_count > 0 %}
+            <form method="post" class="mb-3">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">标记所有为已读</button>
+            </form>
+            {% endif %}
+            
+            <div class="list-group">
+                {% for notification in notifications %}
+                <div class="list-group-item {% if not notification.is_read %}list-group-item-primary{% endif %}">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ notification.title }}</h5>
+                        <small>{{ notification.created_at|date:"Y-m-d H:i" }}</small>
+                    </div>
+                    <p class="mb-1">{{ notification.message }}</p>
+                    <small>
+                        {{ notification.get_notification_type_display }}
+                        {% if notification.related_book %}
+                        - <a href="{% url 'book_detail' notification.related_book.pk %}">查看相关图书</a>
+                        {% endif %}
+                        {% if not notification.is_read %}
+                        - <a href="{% url 'mark_notification_read' notification.pk %}">标记为已读</a>
+                        {% endif %}
+                    </small>
+                </div>
+                {% empty %}
+                <div class="alert alert-info">暂无通知</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

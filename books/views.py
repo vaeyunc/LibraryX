@@ -1,10 +1,10 @@
 from django.shortcuts import render, get_list_or_404, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth import login
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from django.utils import timezone
-from .models import Book, BookBorrowing, Category, BookReturn, BookReservation, UserProfile
+from .models import Book, BookBorrowing, Category, BookReservation, Notification
 from .forms import BookSearchForm, RegisterForm, BorrowingForm, UserProfileForm
 from django.db.models import Count, F, Q
 from datetime import timedelta
@@ -50,6 +50,7 @@ def book_detail(request, pk):
     return render(request, 'books/book_detail.html', context)
 
 @login_required
+@permission_required('books.borrow_book', raise_exception=True)
 def borrow_book(request, pk):
     """借书视图"""
     book = get_object_or_404(Book, pk=pk)
@@ -59,10 +60,24 @@ def borrow_book(request, pk):
             borrowing = form.save(commit=False)
             borrowing.book = book
             borrowing.borrower = request.user
+            
+            # 设置到期时间和状态
+            due_date = timezone.now() + timezone.timedelta(days=30)  # 默认借期30天
+            borrowing.due_date = due_date
+            borrowing.status = 'borrowed'
             borrowing.save()
             
             book.available -= 1
             book.save()
+            
+            # 创建借阅通知
+            create_notification(
+                user=request.user,
+                notification_type='borrow',
+                title=f'成功借阅《{book.title}》',
+                message=f'您已成功借阅《{book.title}》，请在 {due_date.strftime("%Y-%m-%d")} 前归还。',
+                related_book=book
+            )
             
             messages.success(request, f'成功借阅《{book.title}》')
             return redirect('book_detail', pk=pk)
@@ -74,24 +89,46 @@ def borrow_book(request, pk):
         'form': form,
     }
     return render(request, 'books/borrow_book.html', context)
-    
+
 @login_required
+@permission_required('books.return_book', raise_exception=True)
 def return_book(request, pk):
+    """还书视图"""
     borrowing = get_object_or_404(
         BookBorrowing,
-        book_id = pk,
-        borrower = request.user,
-        returned= False
+        book_id=pk,
+        borrower=request.user,
+        returned=False
     )
+    
+    # 检查是否逾期
+    if borrowing.due_date and borrowing.due_date < timezone.now():
+        create_notification(
+            user=request.user,
+            notification_type='overdue',
+            title='图书逾期提醒',
+            message=f'您归还的《{borrowing.book.title}》已逾期，请注意按时还书。',
+            related_book=borrowing.book
+        )
+    else:
+        create_notification(
+            user=request.user,
+            notification_type='return',
+            title='图书归还成功',
+            message=f'您已成功归还《{borrowing.book.title}》，欢迎下次借阅。',
+            related_book=borrowing.book
+        )
+    
     borrowing.returned = True
     borrowing.return_date = timezone.now()
+    borrowing.status = 'returned'
     borrowing.save()
 
     book = borrowing.book
     book.available += 1
     book.save()
 
-    messages.success(request, f'您已成功归还<{book.title}>')
+    messages.success(request, f'您已成功归还《{book.title}》')
     return redirect('book_detail', pk=pk)
 
 @login_required
@@ -104,6 +141,9 @@ def register(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
+            # 添加到读者组
+            reader_group = Group.objects.get(name='读者')
+            user.groups.add(reader_group)
             login(request, user)
             messages.success(request, '注册成功！')
             return redirect('book_list')
@@ -239,8 +279,8 @@ def profile_view(request):
     
     # 获取预约记录 - 修正字段名
     reservations = BookReservation.objects.filter(
-        reservationer=request.user  # 修改这里：使用正确的字段名 reservationer
-    ).order_by('-reservation_date')  # 修改这里：使用正确的字段名 reservation_date
+        reservationer=request.user  
+    ).order_by('-reservation_date')[:5]
 
     context = {
         'user_stats': user_stats,
@@ -267,3 +307,129 @@ def edit_profile(request):
         form = UserProfileForm(instance=request.user)
     
     return render(request, 'accounts/edit_profile.html', {'form': form})
+
+@login_required
+def notification_list(request):
+    """通知列表视图"""
+    notifications = Notification.objects.filter(recipient=request.user).order_by('-created_at')
+    unread_count = notifications.filter(is_read=False).count()
+    
+    context = {
+        'notifications': notifications,
+        'unread_count': unread_count,
+    }
+    return render(request, 'notifications/notification_list.html', context)
+
+@login_required
+def mark_notification_read(request, pk):
+    """标记单个通知为已读"""
+    notification = get_object_or_404(Notification, pk=pk, recipient=request.user)
+    notification.is_read = True
+    notification.save()
+    return redirect('notification_list')
+
+@login_required
+def mark_all_notifications_read(request):
+    """标记所有通知为已读"""
+    if request.method == 'POST':
+        Notification.objects.filter(recipient=request.user, is_read=False).update(is_read=True)
+        messages.success(request, '所有通知已标记为已读')
+    return redirect('notification_list')
+
+def create_notification(user, notification_type, title, message, related_book=None):
+    """创建通知的辅助函数"""
+    Notification.objects.create(
+        recipient=user,
+        notification_type=notification_type,
+        title=title,
+        message=message,
+        related_book=related_book
+    )
+
+@login_required
+@permission_required('books.manage_books', raise_exception=True)
+def manage_books(request):
+    """图书管理视图"""
+
+@login_required
+@permission_required('auth.change_user', raise_exception=True)
+def manage_permissions(request):
+    """权限管理视图"""
+    users = User.objects.all().prefetch_related('groups', 'user_permissions')
+    groups = Group.objects.all().prefetch_related('permissions')
+    
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        group_id = request.POST.get('group_id')
+        action = request.POST.get('action')
+        
+        if all([user_id, group_id, action]):
+            user = User.objects.get(id=user_id)
+            group = Group.objects.get(id=group_id)
+            
+            if action == 'add':
+                user.groups.add(group)
+                messages.success(request, f'已将用户 {user.username} 添加到 {group.name} 组')
+            elif action == 'remove':
+                user.groups.remove(group)
+                messages.success(request, f'已将用户 {user.username} 从 {group.name} 组移除')
+    
+    context = {
+        'users': users,
+        'groups': groups,
+    }
+    return render(request, 'admin/manage_permissions.html', context)
+
+@login_required
+@permission_required('auth.view_user', raise_exception=True)
+def admin_notification_list(request):
+    """通知管理视图"""
+    if not request.user.is_staff:
+        messages.error(request, '您没有权限访问此页面')
+        return redirect('index')
+        
+    notifications = Notification.objects.all().order_by('-created_at')
+    context = {
+        'notifications': notifications,
+        'section': 'notifications',
+        'title': '通知管理',  # 添加标题
+        'site_title': '图书管理系统',  # 添加站点标题
+        'site_header': '图书管理系统后台',  # 添加站点头部
+    }
+    return render(request, 'admin/notification_list.html', context)
+
+@login_required
+@permission_required('auth.view_user', raise_exception=True)
+def admin_message_list(request):
+    """消息管理视图"""
+    if not request.user.is_staff:
+        messages.error(request, '您没有权限访问此页面')
+        return redirect('index')
+        
+    system_messages = Notification.objects.filter(notification_type='system').order_by('-created_at')
+    
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        message = request.POST.get('message')
+        recipients = request.POST.getlist('recipients')
+        
+        for user_id in recipients:
+            user = User.objects.get(id=user_id)
+            create_notification(
+                user=user,
+                notification_type='system',
+                title=title,
+                message=message
+            )
+        messages.success(request, '消息发送成功！')
+        return redirect('admin_message_list')
+    
+    context = {
+        'system_messages': system_messages,
+        'users': User.objects.all(),
+        'section': 'messages',
+        'title': '消息管理',  # 添加标题
+        'site_title': '图书管理系统',  # 添加站点标题
+        'site_header': '图书管理系统后台',  # 添加站点头部
+    }
+    return render(request, 'admin/message_list.html', context)

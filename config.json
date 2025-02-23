@@ -1,6 +1,8 @@
 {
     "site_title": "图书管理系统",
+    "site_header": "图书管理系统后台",
     "site_footer": "图书管理系统 V1.0",
+    "index_title": "管理",
     "menu_style": "vertical",
     "dynamic": false,
     "menus": [
@@ -64,12 +66,12 @@
                 {
                     "name": "系统通知",
                     "icon": "fas fa-bullhorn",
-                    "url": "/admin/notification/"
+                    "url": "/admin/books/notification/"
                 },
                 {
                     "name": "消息提醒",
                     "icon": "fas fa-envelope",
-                    "url": "/admin/message/"
+                    "url": "/admin/books/notification/"
                 }
             ]
         },

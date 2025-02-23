@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}权限管理 - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">权限管理</h1>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">用户权限管理</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>用户名</th>
+                                <th>邮箱</th>
+                                <th>用户组</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td>{{ user.username }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    {% for group in user.groups.all %}
+                                    <span class="badge bg-primary">{{ group.name }}</span>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                                            管理权限
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            {% for group in groups %}
+                                            <li>
+                                                {% if group in user.groups.all %}
+                                                <form method="post" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                                    <input type="hidden" name="group_id" value="{{ group.id }}">
+                                                    <input type="hidden" name="action" value="remove">
+                                                    <button type="submit" class="dropdown-item text-danger">
+                                                        移出 {{ group.name }}
+                                                    </button>
+                                                </form>
+                                                {% else %}
+                                                <form method="post" class="d-inline">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="user_id" value="{{ user.id }}">
+                                                    <input type="hidden" name="group_id" value="{{ group.id }}">
+                                                    <input type="hidden" name="action" value="add">
+                                                    <button type="submit" class="dropdown-item">
+                                                        添加到 {{ group.name }}
+                                                    </button>
+                                                </form>
+                                                {% endif %}
+                                            </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

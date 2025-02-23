@@ -36,6 +36,7 @@ SIMPLEUI_HOME_INFO = False  # 关闭首页的统计信息
 SIMPLEUI_ANALYSIS = False   # 关闭使用分析
 SIMPLEUI_HOME_TITLE = '图书管理系统'
 SIMPLEUI_LOGO = '/static/images/log.png' 
+SIMPLEUI_NAME = "图书管理系统"  # 系统名称
 
 
 # Quick-start development settings - unsuitable for production
@@ -53,11 +54,11 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'simpleui',
-    'admin_interface',
-    'colorfield',
+    'simpleui',  # 必须在 django.contrib.admin 之前
     'django.contrib.admin',
     'django.contrib.auth',
+    'admin_interface',
+    'colorfield',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -92,6 +93,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'books.context_processors.notifications',
             ],
         },
     },

@@ -30,5 +30,9 @@ urlpatterns = [
     path('library-status/', views.library_status, name='library_status'),
     path('statistics/', views.statistics_view, name='statistics'),
     path('passwordReset/', auth_views.PasswordResetView.as_view(), name='password_reset'),
+    path('notifications/', views.notification_list, name='notification_list'),
+    path('notifications/mark-read/<int:pk>/', views.mark_notification_read, name='mark_notification_read'),
+    path('notifications/mark-all-read/', views.mark_all_notifications_read, name='mark_all_notifications_read'),
+    path('admin/permissions/', views.manage_permissions, name='manage_permissions'),
     path('', views.index, name='index'), 
 ]

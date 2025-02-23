@@ -1,5 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group, Permission
+from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 
 class Category(models.Model):
@@ -168,6 +169,55 @@ class UserProfile(models.Model):
         db_table = 'books_userprofile'
         verbose_name = "用户信息"
         verbose_name_plural = verbose_name
+
+class Notification(models.Model):
+    NOTIFICATION_TYPES = (
+        ('borrow', '借阅提醒'),
+        ('return', '归还提醒'),
+        ('overdue', '逾期提醒'),
+        ('reserve', '预约提醒'),
+        ('system', '系统通知'),
+    )
+    
+    recipient = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='接收者')
+    notification_type = models.CharField(max_length=20, choices=NOTIFICATION_TYPES, verbose_name='通知类型')
+    title = models.CharField(max_length=200, verbose_name='通知标题')
+    message = models.TextField(verbose_name='通知内容')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    is_read = models.BooleanField(default=False, verbose_name='是否已读')
+    related_book = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='相关图书')
+    
+    class Meta:
+        db_table = 'books_notification'
+        verbose_name = "系统通知"
+        verbose_name_plural = verbose_name
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.get_notification_type_display()} - {self.title}"
+
+# 定义权限常量
+class UserPermissions:
+    BORROW_BOOK = 'borrow_book'
+    RETURN_BOOK = 'return_book'
+    RESERVE_BOOK = 'reserve_book'
+    MANAGE_BOOKS = 'manage_books'
+    MANAGE_USERS = 'manage_users'
+    
+    @classmethod
+    def get_default_permissions(cls):
+        return [
+            (cls.BORROW_BOOK, '借阅图书'),
+            (cls.RETURN_BOOK, '归还图书'),
+            (cls.RESERVE_BOOK, '预约图书'),
+        ]
+    
+    @classmethod
+    def get_staff_permissions(cls):
+        return [
+            (cls.MANAGE_BOOKS, '管理图书'),
+            (cls.MANAGE_USERS, '管理用户'),
+        ]
         
 
 
